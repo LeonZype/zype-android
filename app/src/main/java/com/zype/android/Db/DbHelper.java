@@ -1,9 +1,14 @@
 package com.zype.android.Db;
 
 import com.google.gson.Gson;
+import com.zype.android.Db.Entity.AdSchedule;
+import com.zype.android.Db.Entity.AnalyticBeacon;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.webapi.model.player.AdvertisingSchedule;
+import com.zype.android.webapi.model.player.Analytics;
+import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.VideoData;
@@ -15,6 +20,29 @@ import java.util.List;
  * Created by Evgeny Cherkasov on 07.07.2018
  */
 public class DbHelper {
+
+    public static List<AdSchedule> adScheduleDataToEntity(List<AdvertisingSchedule> schedule, String videoId) {
+        List<AdSchedule> result = new ArrayList<>();
+        for (AdvertisingSchedule item : schedule) {
+            AdSchedule entity = new AdSchedule();
+            entity.videoId = videoId;
+            entity.offset = item.getOffset();
+            entity.tag = item.getTag();
+            result.add(entity);
+        }
+        return result;
+    }
+
+    public static AnalyticBeacon analyticsToEntity(Analytics analytics) {
+        AnalyticBeacon result = new AnalyticBeacon();
+        result.beacon = analytics.getBeacon();
+        AnalyticsDimensions dimensions = analytics.getDimensions();
+        result.device = dimensions.getDevice();
+        result.playerId = dimensions.getPlayerId();
+        result.siteId = dimensions.getSiteId();
+        result.videoId = dimensions.getVideoId();
+        return result;
+    }
 
     public static List<Playlist> playlistDataToEntity(List<PlaylistData> playlists) {
         List<Playlist> result = new ArrayList<>(playlists.size());
@@ -74,6 +102,7 @@ public class DbHelper {
         entity.keywords = new Gson().toJson(videoData.getKeywords());
         entity.matureContent = String.valueOf(videoData.isMatureContent() ? 1 : 0);
         entity.onAir = videoData.isOnAir() ? 1 : 0;
+        entity.previewIds = new Gson().toJson(videoData.previewIds);
         entity.publishedAt = videoData.getPublishedAt();
         entity.purchaseRequired = String.valueOf(videoData.isPurchaseRequired() ? 1 : 0);
         entity.rating = String.valueOf(videoData.getRating());

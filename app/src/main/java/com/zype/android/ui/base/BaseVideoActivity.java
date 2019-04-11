@@ -305,7 +305,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         }
     }
 
-    private void showFragment(Fragment fragment) {
+    protected void showFragment(Fragment fragment) {
         Logger.d("showFragment()");
         hideProgress();
         if (mInterface != null) {
@@ -740,11 +740,13 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             Logger.e("VideoId is empty !!");// но тут должен быть путь
         }
         if (mType == TYPE_WEB) {
-            if (AuthHelper.isVideoAuthorized(this, mVideoId)) {
-                Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
-                if (video != null &&
-                        (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video))) {
-                    requestVideoUrl(mVideoId);
+            if (!ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
+                if (AuthHelper.isVideoAuthorized(this, mVideoId)) {
+                    Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+                    if (video != null &&
+                            (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video))) {
+                        requestVideoUrl(mVideoId);
+                    }
                 }
             }
         }

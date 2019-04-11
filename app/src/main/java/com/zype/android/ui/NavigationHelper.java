@@ -202,12 +202,18 @@ public class NavigationHelper {
 
     // Video
 
-    public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
-        if (AuthHelper.isVideoAuthorized(activity, video.id)) {
+    public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId,
+                                 boolean autoplay) {
+        if (ZypeApp.get(activity).getAppConfiguration().updatedPaywalls) {
+            // New paywall flow
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {
-            handleUnauthorizedVideo(activity, video, null);
+            if (AuthHelper.isVideoAuthorized(activity, video.id)) {
+                switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
+            } else {
+                handleUnauthorizedVideo(activity, video, null);
+            }
         }
     }
 

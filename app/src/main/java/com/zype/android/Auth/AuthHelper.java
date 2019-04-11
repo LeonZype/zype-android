@@ -82,9 +82,13 @@ public class AuthHelper {
     }
 
     public static boolean isVideoAuthorized(Context context, String videoId) {
+        Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
+        return isVideoAuthorized(context, video);
+    }
+
+    public static boolean isVideoAuthorized(Context context, Video video) {
         boolean result = true;
 
-        Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
         if (video == null) {
             return false;
         }
@@ -99,7 +103,7 @@ public class AuthHelper {
             }
             else {
                 // Video requires purchase, but UTVOD options is turned off in the app configuration
-                Logger.w("Video " + videoId + " requires purchase, but universal TVOD feature " +
+                Logger.w("Video " + video.id + " requires purchase, but universal TVOD feature " +
                         "is turned off in the app configuration.");
                 result = false;
             }
@@ -137,13 +141,12 @@ public class AuthHelper {
             else {
                 // Video requires subscription, but NSVOD and USVOD options are turned off
                 // in the app configuration
-                Logger.w("Video " + videoId + " requires subscription, but subscription features " +
+                Logger.w("Video " + video.id + " requires subscription, but subscription features " +
                         "are turned off the app configuration.");
                 result = false;
             }
         }
 
         return result;
-
     }
 }
