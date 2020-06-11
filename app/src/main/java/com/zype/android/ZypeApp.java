@@ -33,6 +33,7 @@ import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
@@ -111,6 +112,8 @@ public class ZypeApp extends MultiDexApplication {
         WebApiManager.getInstance().subscribe(this);
 
         initApp();
+        // ThreeTenABP library is used for parsing durations
+        AndroidThreeTen.init(this);
 
         // Fabric
         // TODO: Uncomment following line to use Fabric
@@ -181,18 +184,16 @@ public class ZypeApp extends MultiDexApplication {
         });
 
         // Setup marketplace connect
-        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
+        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)
+            || (ZypeConfiguration.isNativeTvodEnabled(this) && ZypeConfiguration.isUniversalTVODEnabled(this))) {
             marketplaceGateway = new MarketplaceGateway(this, ZypeConfiguration.getAppKey(),
                     ZypeConfiguration.getPlanIds());
             marketplaceGateway.setup();
         }
 
-        AuthHelper.onLoggedIn(new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean isLoggedIn) {
-                if (isLoggedIn) {
-                    loadConsumer();
-                }
+        AuthHelper.onLoggedIn(isLoggedIn -> {
+            if (isLoggedIn) {
+                loadConsumer();
             }
         });
     }

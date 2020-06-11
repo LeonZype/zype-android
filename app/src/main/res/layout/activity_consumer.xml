@@ -7,72 +7,101 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_margin="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
     tools:context="com.zype.android.ui.Consumer.ConsumerActivity"
     >
-    <LinearLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:id="@+id/layoutForm"
+        android:layout_marginBottom="0dp"
         >
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/consumer_create_form_subtitle"
-            android:gravity="center_horizontal"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/consumer_create_form_description"
-            android:gravity="center_horizontal"
-            />
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/layoutEmail"
-            android:hint="@string/consumer_email"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:id="@+id/layoutForm"
             >
-            <android.support.design.widget.TextInputEditText
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="72dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/splash_logo"
+                />
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
+                android:layout_marginBottom="8dp"
+                android:id="@+id/textTitle"
+                android:text="@string/consumer_create_form_title"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:id="@+id/layoutPassword"
-            android:hint="@string/consumer_password"
-            >
-            <android.support.design.widget.TextInputEditText
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
+                android:layout_marginBottom="12dp"
+                android:id="@+id/textDescription"
+                android:text="@string/consumer_create_form_description"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="10sp"
                 />
-        </android.support.design.widget.TextInputLayout>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="20dp"
-            android:id="@+id/buttonUpdate"
-            android:text="@string/consumer_button_update"
-            style="@style/Widget.AppCompat.Button.Colored"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textTerms"
-            android:text="@string/consumer_create_terms"
-            android:gravity="center_horizontal"
-            />
-    </LinearLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:id="@+id/layoutEmail"
+                android:hint="@string/consumer_email"
+                >
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textSize="12sp"
+                    />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:layout_marginBottom="8dp"
+                android:id="@+id/layoutPassword"
+                android:hint="@string/consumer_password"
+                >
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textSize="12sp"
+                    />
+            </android.support.design.widget.TextInputLayout>
+            <Button
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:id="@+id/buttonUpdate"
+                android:text="@string/consumer_button_update"
+                style="@style/Widget.AppCompat.Button.Colored"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textTerms"
+                android:text="@string/consumer_create_terms"
+                android:gravity="center_horizontal"
+                />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

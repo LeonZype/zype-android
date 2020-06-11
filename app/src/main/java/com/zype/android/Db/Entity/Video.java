@@ -4,6 +4,10 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Evgeny Cherkasov on 13.06.2018
@@ -66,7 +70,7 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "guest")
     public String guest;
 
-    @ColumnInfo(name = "EntitlementUpdatedAt")
+    @ColumnInfo(name = "entitlement_updated_at")
     public String entitlementUpdatedAt;
 
     @ColumnInfo(name = "episode")
@@ -96,7 +100,7 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "is_downloaded_audio_should_be")
     public Integer isDownloadedAudioShouldBe;
 
-    @ColumnInfo(name = "IsEntitled")
+    @ColumnInfo(name = "is_entitled")
     public Integer isEntitled;
 
     @ColumnInfo(name = "is_favorite")
@@ -135,6 +139,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "playlists")
     public String playlists;
 
+    @ColumnInfo(name = "preview_ids")
+    public String previewIds;
+
     @ColumnInfo(name = "published_at")
     public String publishedAt;
 
@@ -158,6 +165,9 @@ public class Video implements PlaylistItem {
 
     @ColumnInfo(name = "segments")
     public String segments;
+
+    @ColumnInfo(name = "serialized_playlist_ids")
+    public String serializedPlaylistIds;
 
     @ColumnInfo(name = "short_description")
     public String shortDescription;
@@ -206,4 +216,5 @@ public class Video implements PlaylistItem {
     public String getTitle() {
         return title;
     }
+
 }

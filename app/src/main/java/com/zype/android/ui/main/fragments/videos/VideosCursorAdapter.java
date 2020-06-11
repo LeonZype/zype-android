@@ -7,8 +7,6 @@ import com.google.gson.reflect.TypeToken;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.SubscriptionsHelper;
-import com.zype.android.Db.Entity.Playlist;
-import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -19,7 +17,6 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
-import com.zype.android.ui.Gallery.GalleryRowItemsAdapter;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
@@ -462,9 +459,9 @@ public class VideosCursorAdapter extends CursorAdapter {
     }
 
     private void updateLockIcon(VideosViewHolder holder) {
-        if (AuthHelper.isVideoRequiredAuthorization(holder.thumbnail.getContext(), holder.videoId)) {
+        if (AuthHelper.isPaywalledVideo(holder.thumbnail.getContext(), holder.videoId, null)) {
             holder.imageLocked.setVisibility(View.VISIBLE);
-            if (AuthHelper.isVideoAuthorized(holder.thumbnail.getContext(), holder.videoId)) {
+            if (AuthHelper.isVideoUnlocked(holder.thumbnail.getContext(), holder.videoId, null)) {
                 holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                 UiUtils.setImageColor(holder.imageLocked,
                         ContextCompat.getColor(holder.thumbnail.getContext(), R.color.icon_unlocked));

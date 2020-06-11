@@ -78,12 +78,13 @@
     <string name="subtitles_off">Turn off</string>
 
     <!-- Consumer -->
-    <string name="consumer_button_update">Create Account</string>
-    <string name="consumer_create_form_description">Enter a valid email and password. Account credentials will allow access on all devices.</string>
-    <string name="consumer_create_form_subtitle">Create your account</string>
+    <string name="consumer_button_update">Create account</string>
+    <string name="consumer_create_form_description">Enter a valid email and password to create your account. Account credentials will allow access on all devices.</string>
+    <string name="consumer_create_form_subtitle">Get all of %1$s!</string>
+    <string name="consumer_create_form_title">Create your account</string>
     <string name="consumer_create_sign_in">Already have an account? Sign in</string>
     <string name="consumer_create_sign_in_link">Sign in</string>
-    <string name="consumer_create_terms">By clicking Create Account, you agree to our Terms of Service and Privacy</string>
+    <string name="consumer_create_terms">By clicking Continue, you agree to our Terms of Service and Privacy</string>
     <string name="consumer_create_terms_link">Terms of Service and Privacy</string>
     <string name="consumer_email">Email</string>
     <string name="consumer_email_error_empty">Email is required</string>
@@ -125,6 +126,11 @@
     <string name="intro_button_login">Log in</string>
     <string name="intro_button_trial">Start Free Trial</string>
 
+    <!-- Library -->
+    <string name="library_empty_title">It looks like you haven’t purchased any content yet.</string>
+    <string name="library_empty_message">Once purchased, your library of content will appear in this section.</string>
+    <string name="library_signed_out_title">Sign in for access to your library of purchased content.</string>
+
     <!-- Login -->
     <string name="login_button_device_linked">Continue</string>
     <string name="login_button_email">Sign in with email</string>
@@ -142,6 +148,7 @@
     <string name="login_sign_up">Don\'t have an account? Sign up</string>
     <string name="login_sign_up_link">Sign up</string>
     <string name="login_title">Sign In</string>
+    <string name="login_subtitle"></string>
 
     <!-- Main -->
     <string name="main_tab_my_library">My library</string>
@@ -151,7 +158,8 @@
     <string name="menu_navigation_favorites">Favorites</string>
     <string name="menu_navigation_home">Home</string>
     <string name="menu_navigation_guide">Guide</string>
-
+    <string name="menu_navigation_library">Library</string>
+    <string name="menu_navigation_live">Live</string>
     <string name="menu_navigation_settings">Settings</string>
 
     <!-- My library -->
@@ -163,6 +171,13 @@
     <!--Notifications -->
     <string name="notification_channel_name">Zype</string>
     <string name="notification_channel_description">Zype Notification Channel</string>
+
+    <!-- Paywall -->
+    <string name="paywall_button_buy_playlist">Buy all %1$d videos - $%2$s</string>
+    <string name="paywall_error_validation">We\'re sorry, there was a problem validating your purchase.</string>
+    <string name="paywall_subtitle">Get access to Premium Content across all devices</string>
+    <string name="paywall_title">Enjoy %1$s</string>
+    <string name="paywall_verifying_purchase">Verifying purchase</string>
 
     <!-- Player -->
     <string name="menu_player_closed_captions">Closed captions</string>
@@ -183,19 +198,24 @@
     <string name="subscription_logged_in">Signed in as: </string>
     <string name="subscription_title">Select Plan</string>
     <string name="subscription_verify">Verifying subscription</string>
+    <string name="subscription_trial_days"> (after %1$d day free trial)</string>
 
     <string name="subscribe_or_login_button_restore">Restore Purchases</string>
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
     <string name="subscribe_or_login_error_restore_purchase_zype">Not found Zype Plan for existing in-app subscription</string>
     <string name="subscribe_or_login_error_validation">We\'re sorry, there was a problem validating your subscription. Please close the app and visit Subscribe or Login > Restore Purchase upon reload.</string>
-    <string name="subscribe_or_login_title">Subscribe or Sign In</string>
+    <string name="subscribe_or_login_title">Enjoy %1$s</string>
+    <string name="subscribe_or_login_subtitle">Get access to Premium Content across all devices</string>
 
     <!-- Videos -->
+    <string name="video_detail_button_play_trailer">Trailer</string>
+    <string name="video_detail_button_watch_now">Watch Now</string>
     <string name="video_error_bad_request">We’re sorry, but there’s an issue playing this video.
         Please try again later, or try watching another video.</string>
     <string name="video_options_play_as_audio">Play as Audio</string>
     <string name="video_options_play_as_video">Play as Video</string>
     <string name="videos_loading">Gathering videos for you…</string>
+    <string name="videos_episode">Episode %1$s</string>
     <string name="videos_error">We’re sorry, but there’s an issue loading videos.</string>
 
 

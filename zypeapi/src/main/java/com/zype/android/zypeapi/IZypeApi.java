@@ -38,7 +38,8 @@ import retrofit2.http.QueryMap;
  */
 
 public interface IZypeApi {
-    String HEADER_USER_AGENT = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
+//    String HEADER_USER_AGENT = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
+    String HEADER_USER_AGENT = System.getProperty("http.agent") + " Zype Android ";
 
     String PARAM_PAGE = "page";
 
@@ -79,8 +80,7 @@ public interface IZypeApi {
                                              @QueryMap HashMap<String, String> params);
 
     @GET("/consumer/videos")
-    Call<VideoEntitlementsResponse> getVideoEntitlements(@Query(PARAM_PAGE) int page,
-                                                         @QueryMap HashMap<String, String> params);
+    Call<VideoEntitlementsResponse> getVideoEntitlements(@QueryMap HashMap<String, String> params);
 
     // Video Favorites
     @GET("/consumers/{consumer_id}/video_favorites")
@@ -101,6 +101,9 @@ public interface IZypeApi {
     // Marketplace connect
     @POST("https://mkt.zype.com/v1/amazon/transactions")
     Call<MarketplaceConnectResponse> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
+
+    @POST("https://mkt.zype.com/v1/googleplay/transactions")
+    Call<ResponseBody> verifyTvodPurchaseGoogle(@Body MarketplaceConnectBody body);
 
     // Playlist
     @GET("/playlists")

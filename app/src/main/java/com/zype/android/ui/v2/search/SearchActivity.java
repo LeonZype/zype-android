@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.v2.base.DataState;
 import com.zype.android.ui.v2.base.StatefulData;
 import com.zype.android.ui.v2.videos.VideosAdapter;
@@ -98,48 +99,67 @@ public class SearchActivity extends AppCompatActivity {
 
         model = ViewModelProviders.of(this).get(SearchViewModel.class);
         model.getVideos().observe(this, createVideosObserver());
+
+        model.getSelectedVideo().observe(this, video -> {
+            if (video != null) {
+                NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
+                navigationHelper.handleVideoClick(this, video, null, false);
+                model.onSelectedVideoProcessed();
+            }
+        });
+        adapter.setVideoListener((video) -> {
+            model.onVideoClicked(video);
+        });
+        adapter.setPopupMenuListener((action, video) -> {
+            model.handleVideoAction(action, video, success -> {
+                if (success) {
+                    model.refresh();
+                }
+                else {
+                    NavigationHelper.getInstance(SearchActivity.this).switchToLoginScreen(SearchActivity.this);
+                }
+            });
+        });
+
     }
 
     private Observer<StatefulData<List<Video>>> createVideosObserver() {
-        return new Observer<StatefulData<List<Video>>>() {
-            @Override
-            public void onChanged(@Nullable StatefulData<List<Video>> videos) {
-                Log.d(TAG, "getVideos()::onChanged()");
-                if (videos.state == DataState.READY) {
-                    hideKeyboard();
-                    hideProgress();
-                    adapter.setData(videos.data);
-                    if (videos.data == null || videos.data.isEmpty()) {
-                        if (TextUtils.isEmpty(viewSearch.getQuery())) {
-                            showEmptyQuery(true);
-                            showEmptyResult(false);
-                        }
-                        else {
-                            showEmptyQuery(false);
-                            showEmptyResult(true);
-                        }
+        return videos -> {
+            Log.d(TAG, "getVideos()::onChanged()");
+            if (videos.state == DataState.READY) {
+                hideKeyboard();
+                hideProgress();
+                adapter.setData(videos.data);
+                if (videos.data == null || videos.data.isEmpty()) {
+                    if (TextUtils.isEmpty(viewSearch.getQuery())) {
+                        showEmptyQuery(true);
+                        showEmptyResult(false);
                     }
                     else {
                         showEmptyQuery(false);
-                        showEmptyResult(false);
+                        showEmptyResult(true);
                     }
                 }
-                else if (videos.state == DataState.LOADING) {
-                    hideKeyboard();
-                    showProgress();
-                    listVideos.setVisibility(GONE);
-                    textEmptyResult.setVisibility(GONE);
-                    textErrorEmptyQuery.setVisibility(GONE);
-                }
-                else if (videos.state == DataState.ERROR) {
-                    hideProgress();
-                    adapter.setData(null);
-                    showEmptyQuery(false);
-                    showEmptyResult(true);
-                }
                 else {
-                    Logger.e("getVideos()::onChanged(): Unknown state");
+                    showEmptyQuery(false);
+                    showEmptyResult(false);
                 }
+            }
+            else if (videos.state == DataState.LOADING) {
+                hideKeyboard();
+                showProgress();
+                listVideos.setVisibility(GONE);
+                textEmptyResult.setVisibility(GONE);
+                textErrorEmptyQuery.setVisibility(GONE);
+            }
+            else if (videos.state == DataState.ERROR) {
+                hideProgress();
+                adapter.setData(null);
+                showEmptyQuery(false);
+                showEmptyResult(true);
+            }
+            else {
+                Logger.e("getVideos()::onChanged(): Unknown state");
             }
         };
     }

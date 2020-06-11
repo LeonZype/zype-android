@@ -1,11 +1,7 @@
 package com.zype.android.ui.Gallery;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,20 +13,13 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistItem;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
-import com.zype.android.ui.main.fragments.videos.VideosActivity;
-import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
-import com.zype.android.utils.BundleConstants;
-import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.Thumbnail;
@@ -76,6 +65,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         holder.item = items.get(position);
 
         updateTitle(holder);
+        updateInlineTitle(holder);
         loadThumbnail(holder);
         updateLockIcon(holder);
 
@@ -110,6 +100,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         public PlaylistItem item;
         public FrameLayout layoutTitle;
         public TextView textTitle;
+        public TextView textInlineTitle;
         public ImageView imageThumbnail;
         public ImageView imageLocked;
 
@@ -118,6 +109,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
             this.view = view;
             layoutTitle = view.findViewById(R.id.layoutTitle);
             textTitle = view.findViewById(R.id.textTitle);
+            textInlineTitle = view.findViewById(R.id.textInlineTitle);
             imageThumbnail = view.findViewById(R.id.imageThumbnail);
             imageLocked = view.findViewById(R.id.imageLocked);
         }
@@ -184,12 +176,22 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         }
     }
 
+    private void updateInlineTitle(ViewHolder holder) {
+        if (ZypeConfiguration.playlistGalleryItemInlineTitles()) {
+            holder.textInlineTitle.setVisibility(View.VISIBLE);
+            holder.textInlineTitle.setText(holder.item.getTitle());
+        }
+        else {
+            holder.textInlineTitle.setVisibility(GONE);
+        }
+    }
+
     private void updateLockIcon(ViewHolder holder) {
         if (holder.item instanceof Video) {
             Video video = (Video) holder.item;
-            if (AuthHelper.isVideoRequiredAuthorization(holder.view.getContext(), video.id)) {
+            if (AuthHelper.isPaywalledVideo(holder.view.getContext(), video.id, playlistId)) {
                 holder.imageLocked.setVisibility(View.VISIBLE);
-                if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
+                if (AuthHelper.isVideoUnlocked(holder.view.getContext(), video.id, playlistId)) {
                     holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                     UiUtils.setImageColor(holder.imageLocked,
                             ContextCompat.getColor(holder.view.getContext(), R.color.icon_unlocked));

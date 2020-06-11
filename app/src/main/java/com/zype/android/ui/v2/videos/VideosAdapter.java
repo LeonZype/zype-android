@@ -3,6 +3,7 @@ package com.zype.android.ui.v2.videos;
 import android.app.Activity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +22,9 @@ import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
 import com.zype.android.ui.main.fragments.videos.VideosMenuItem;
 import com.zype.android.utils.FileUtils;
@@ -44,6 +43,8 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
     private String playlistId;
     boolean usePoster = false;
     private boolean showDownloadOptions = false;
+    private IPopupMenu menuListener;
+    private IVideoListener videoListener;
 
     private static final int ITEM_UNFAVORITE = 0;
     private static final int ITEM_FAVORITE = 1;
@@ -54,9 +55,25 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
     private static final int ITEM_DOWNLOAD_AUDIO = 6;
     private static final int ITEM_SHARE = 10;
 
+    public interface IPopupMenu {
+        void onMenuItemSelected(int action, Video video);
+    }
+
+    public interface IVideoListener {
+        void onVideoClicked(Video video);
+    }
+
     public VideosAdapter(String playlistId) {
         items = new ArrayList<>();
         this.playlistId = playlistId;
+    }
+
+    public void setPopupMenuListener(IPopupMenu listener) {
+        this.menuListener = listener;
+    }
+
+    public void setVideoListener(IVideoListener listener) {
+        this.videoListener = listener;
     }
 
     public void setData(List<Video> items) {
@@ -75,17 +92,18 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
     public void onBindViewHolder(final VideosAdapter.ViewHolder holder, int position) {
         holder.item = items.get(position);
         holder.textTitle.setText(holder.item.title);
+        updateInfo(holder);
         loadThumbnail(holder);
         updateLockIcon(holder);
         updateDownloadProgress(holder);
         updatePopupMenu(holder);
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavigationHelper navigationHelper = NavigationHelper.getInstance(holder.view.getContext());
-                Video video = (Video) holder.item;
-                navigationHelper.handleVideoClick((Activity) holder.view.getContext(), video, playlistId, false);
+        holder.view.setOnClickListener(v -> {
+            if (videoListener != null) {
+                videoListener.onVideoClicked(holder.item);
             }
+//            NavigationHelper navigationHelper = NavigationHelper.getInstance(holder.view.getContext());
+//            Video video = holder.item;
+//            navigationHelper.handleVideoClick((Activity) holder.view.getContext(), video, playlistId, false);
         });
     }
 
@@ -103,6 +121,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
         public final View view;
         public Video item;
         public TextView textTitle;
+        public TextView textInfo;
         public ImageView imageLocked;
         public ImageView imagePopup;
         public ImageView imageThumbnail;
@@ -112,11 +131,24 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
             super(view);
             this.view = view;
             textTitle = view.findViewById(R.id.textTitle);
+            textInfo = view.findViewById(R.id.textInfo);
             imageLocked = view.findViewById(R.id.imageLocked);
             imagePopup = view.findViewById(R.id.imagePopup);
             imageThumbnail = view.findViewById(R.id.imageThumbnail);
             progressDownload = view.findViewById(R.id.progressDownload);
         }
+    }
+
+    private void updateInfo(ViewHolder holder) {
+        String info = "";
+        String episode = "";
+        if (!TextUtils.isEmpty(holder.item.episode)) {
+            episode = String.format(holder.view.getContext().getString(R.string.videos_episode), holder.item.episode);
+        }
+        if (!TextUtils.isEmpty(episode)) {
+            info += episode;
+        }
+        holder.textInfo.setText(info);
     }
 
     private void loadThumbnail(ViewHolder holder) {
@@ -145,9 +177,10 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
 
     private void updateLockIcon(ViewHolder holder) {
         Video video = holder.item;
-        if (AuthHelper.isVideoRequiredAuthorization(holder.view.getContext(), video.id)) {
+        if (!TextUtils.isEmpty(playlistId)
+                && AuthHelper.isPaywalledVideo(holder.view.getContext(), video.id, playlistId)) {
             holder.imageLocked.setVisibility(View.VISIBLE);
-            if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
+            if (AuthHelper.isVideoUnlocked(holder.view.getContext(), video.id, playlistId)) {
                 holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                 UiUtils.setImageColor(holder.imageLocked,
                         ContextCompat.getColor(holder.view.getContext(), R.color.icon_unlocked));
@@ -176,32 +209,36 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
 
     private void updatePopupMenu(final ViewHolder holder) {
         final ArrayList<VideosMenuItem> items = new ArrayList<>(getPopupMenuItems(holder));
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.view.showContextMenu();
+        View.OnClickListener listener = view -> {
+            holder.view.showContextMenu();
 
-                final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(items);
-                fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Map<String, String> event;
-                        Tracker tracker = ZypeApp.getTracker();
-                        switch (fragment.getList().get(position).getId()) {
-                            case ITEM_UNFAVORITE:
-                                VideoActionsHelper.onUnfavorite(holder.item, (Activity) holder.view.getContext());
-                                event = new HitBuilders.EventBuilder()
-                                        .setAction("Unfavorite")
-                                        .setLabel("id=" + holder.item.id)
-                                        .build();
-                                break;
-                            case ITEM_FAVORITE:
-                                VideoActionsHelper.onFavorite(holder.item, (Activity) holder.view.getContext());
-                                event = new HitBuilders.EventBuilder()
-                                        .setAction("Favorite")
-                                        .setLabel("id=" + holder.item.id)
-                                        .build();
-                                break;
+            final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(items);
+            fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Map<String, String> event;
+                    Tracker tracker = ZypeApp.getTracker();
+                    switch (fragment.getList().get(position).getId()) {
+                        case ITEM_UNFAVORITE:
+                            if (menuListener != null) {
+                                menuListener.onMenuItemSelected(VideoActionsHelper.ACTION_UNFAVORITE, holder.item);
+                            }
+//                            VideoActionsHelper.onUnfavorite(holder.item, (Activity) holder.view.getContext(), null);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Unfavorite")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
+                        case ITEM_FAVORITE:
+                            if (menuListener != null) {
+                                menuListener.onMenuItemSelected(VideoActionsHelper.ACTION_FAVORITE, holder.item);
+                            }
+//                            VideoActionsHelper.onFavorite(holder.item, (Activity) holder.view.getContext(), null);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Favorite")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
 //                            case ITEM_SHARE:
 //                                videoActionListener.onShareVideo(holder.item.id);
 //                                event = new HitBuilders.EventBuilder()
@@ -254,9 +291,9 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
                             tracker.send(event);
                         }
                     }
-                });
-                fragment.show(((Activity) holder.view.getContext()).getFragmentManager(), "menu");
-            }
+            });
+            fragment.show(((Activity) holder.view.getContext()).getFragmentManager(), "menu");
+//            }
         };
         if (items.isEmpty()) {
             holder.imagePopup.setVisibility(GONE);
@@ -272,8 +309,8 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
         List<VideosMenuItem> list = new ArrayList<>();
 
         int currentProgress = DownloaderService.currentProgress(holder.item.id);
-        if (SettingsProvider.getInstance().isLoggedIn()
-                || !ZypeConfiguration.isUniversalSubscriptionEnabled(holder.view.getContext())) {
+        if (AuthHelper.isLoggedIn()
+                || !ZypeApp.get(holder.view.getContext()).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
             if (holder.item.isFavorite != null && holder.item.isFavorite == 1) {
                 list.add(new VideosMenuItem(ITEM_UNFAVORITE, R.string.menu_unfavorite));
             }

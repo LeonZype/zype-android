@@ -56,9 +56,12 @@ public class DbHelper {
         entity.createdAt = data.createdAt;
         entity.deletedAt = data.deletedAt;
         entity.images = new Gson().toJson(data.images);
+        entity.marketplaceIds = new Gson().toJson(data.marketplaceIds);
         entity.parentId = data.parentId;
         entity.playlistItemCount = data.playlistItemCount;
         entity.priority = data.priority;
+        entity.purchasePrice = data.purchasePrice;
+        entity.purchaseRequired = data.purchaseRequired ? 1 : 0;
         entity.thumbnails = new Gson().toJson(data.thumbnails);
         entity.thumbnailLayout = data.thumbnailLayout;
         entity.title = data.title;
@@ -75,6 +78,9 @@ public class DbHelper {
             playlistEntity.createdAt = item.getCreatedAt();
             playlistEntity.deletedAt = item.getDeletedAt();
             playlistEntity.images = new Gson().toJson(item.getImages());
+            playlistEntity.marketplaceIds = new Gson().toJson(item.marketplaceIds);
+            playlistEntity.purchasePrice = item.purchasePrice;
+            playlistEntity.purchaseRequired = item.purchaseRequired ? 1 : 0;
             playlistEntity.parentId = item.getParentId();
             playlistEntity.playlistItemCount = item.getPlaylistItemCount();
             playlistEntity.priority = item.getPriority();
@@ -115,7 +121,7 @@ public class DbHelper {
         entity.description = (videoData.getDescription() == null) ? "" : videoData.getDescription();
         entity.discoveryUrl = videoData.getDiscoveryUrl();
         entity.duration = videoData.getDuration();
-        entity.episode = String.valueOf(videoData.getEpisode());
+        entity.episode = (videoData.getEpisode() == null) ? "" : String.valueOf(videoData.getEpisode());
         entity.expireAt = videoData.getExpireAt();
         entity.featured = String.valueOf(videoData.isFeatured() ? 1 : 0);
         entity.foreignId = videoData.getForeignId();
@@ -124,6 +130,7 @@ public class DbHelper {
         entity.keywords = new Gson().toJson(videoData.getKeywords());
         entity.matureContent = String.valueOf(videoData.isMatureContent() ? 1 : 0);
         entity.onAir = videoData.isOnAir() ? 1 : 0;
+        entity.previewIds = new Gson().toJson(videoData.previewIds);
         entity.publishedAt = videoData.getPublishedAt();
         entity.purchaseRequired = String.valueOf(videoData.isPurchaseRequired() ? 1 : 0);
         entity.rating = String.valueOf(videoData.getRating());
@@ -187,7 +194,7 @@ public class DbHelper {
         entity.description = (videoData.description == null) ? "" : videoData.description;
         entity.discoveryUrl = videoData.discoveryUrl;
         entity.duration = videoData.duration;
-        entity.episode = String.valueOf(videoData.episode);
+        entity.episode = (videoData.episode == null) ? "" : String.valueOf(videoData.episode);
         entity.expireAt = videoData.expireAt;
         entity.featured = String.valueOf(videoData.featured ? 1 : 0);
         entity.foreignId = videoData.foreignId;
@@ -196,6 +203,7 @@ public class DbHelper {
         entity.keywords = new Gson().toJson(videoData.keywords);
         entity.matureContent = String.valueOf(videoData.matureContent ? 1 : 0);
         entity.onAir = videoData.onAir ? 1 : 0;
+        entity.previewIds = new Gson().toJson(videoData.previewIds);
         entity.publishedAt = videoData.publishedAt;
         entity.purchaseRequired = String.valueOf(videoData.purchaseRequired ? 1 : 0);
         entity.rating = String.valueOf(videoData.rating);
@@ -204,6 +212,7 @@ public class DbHelper {
         entity.requestCount = String.valueOf(videoData.requestCount);
         entity.season = videoData.season;
         entity.segments = new Gson().toJson(videoData.segments);
+        entity.serializedPlaylistIds = new Gson().toJson(videoData.serializablePlaylistIds);
         entity.shortDescription = videoData.shortDescription;
         entity.siteId = videoData.siteId;
         entity.startAt = videoData.startAt;

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
+
+import org.threeten.bp.Period;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -289,7 +292,17 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             holder.item = items.get(position);
             if (holder.item.getMarketplace() != null) {
                 holder.textTitle.setText(holder.item.getMarketplace().getTitle());
-                holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
+                String periodText = getPeriodText(holder.item.getMarketplace().getSubscriptionPeriod());
+                String price;
+                if (TextUtils.isEmpty(periodText)) {
+                    price = String.valueOf(holder.item.getMarketplace().getPrice());
+                }
+                else {
+                    price = String.format("%1$s/%2$s", holder.item.getMarketplace().getPrice(), periodText);
+                }
+                holder.textPrice.setText(price);
+                String trialText = getTrialText(holder.item.getMarketplace().getFreeTrialPeriod());
+                holder.textTrial.setText(trialText);
                 holder.textDescription.setText(holder.item.getMarketplace().getDescription());
                 holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
                 holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
@@ -312,6 +325,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             public Subscription item;
             public TextView textTitle;
             public TextView textPrice;
+            public TextView textTrial;
             public TextView textDescription;
             public Button buttonContinue;
 
@@ -320,9 +334,29 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                 this.view = view;
                 textTitle = view.findViewById(R.id.textTitle);
                 textPrice = view.findViewById(R.id.textPrice);
+                textTrial = view.findViewById(R.id.textTrial);
                 textDescription = view.findViewById(R.id.textDescription);
                 buttonContinue = view.findViewById(R.id.buttonContinue);
             }
+        }
+
+        private String getPeriodText(String subscriptionPeriod) {
+            switch (subscriptionPeriod) {
+                case "P1M":
+                    return "month";
+                case "P1Y":
+                    return "year";
+                default:
+                    return "";
+            }
+        }
+
+        private String getTrialText(String trialPeriod) {
+            if (TextUtils.isEmpty(trialPeriod)) {
+                return "";
+            }
+            int freeTrialDays = Period.parse(trialPeriod).getDays();
+            return String.format(getString(R.string.subscription_trial_days), freeTrialDays);
         }
     }
 
